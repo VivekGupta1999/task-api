@@ -1,0 +1,202 @@
+Dotenv
+
+Dotenv is a zero-dependenvy module that loads environment variables from a .env file into process.env.
+Storing configuration in the enviroment seperate from the code.
+
+Express
+Express is a routing and a middleware lighweight framework.
+Creating APIs with it is easy and robust.
+
+Express also let us create routes meaning setting up different enpoints that our application responds to when clients put in requests.
+We attach different handler functions to these endoints that run our logic on the backend for these endpoints.
+
+We will be using Express.Router Class to create a modular and mountable Route Handler.
+As this is a complete middleware and routing system it is also often refered as a mini app.
+We will then import this route handler in our main file to use it.
+
+Mongoose
+Mongoose is an object Data Model library for MONGO DB.
+Mongoose can be used for Data modeling, schema enforcement, model validation and general data manipulation.
+
+Mongoose SCHEMA
+A schema defines a structure for our collection documents. A mongoose schema maps directly to the a
+Mongo DB Collection.
+
+Model
+Models take our schema and apply to each document in its collection.
+Models are responsible for all document interactions such as CRUD operations.
+
+Before writing a schema we have to decide:
+
+1. what field exists.
+2. which are required.
+3. what types they are.
+4. what the default values are.
+5. what validation rule exists.
+
+We will have these fields:
+
+1. title - string - required
+2. description - string - optional
+3. completed - boolean - false(default)
+4. dueDate - DateTime - optional
+
+example task
+{
+title:"Buy Groceries",
+description: "Milk,eggs, bread",
+completed: false,
+dueDate: 2024-01-10,
+createdAt:.... ,
+updatedAt:.....
+}
+
+The model will be located in models folder
+
+Task Controllers
+What a controller is:
+
+1. A controller where is the request logic lives.
+2. It receives the request, talks to the model, sends a response.
+3. It does not define routes and does not start the server.
+
+Controllers should:
+
+1. Read input from the request (params, body, query).
+2. Call the model(DB operations)
+3. Decide the success vs failures.
+4. Sends a response with status + data.
+
+Controllers should not:
+
+1.  not now router paths.
+2.  not import or use app.
+3.  not Start the server.
+4.  not Contain DB connection logic.
+
+Our Controller will have four tasks:
+
+1. Create Task
+   . Create a new task from request body.
+
+2. getAll Taask
+   .Fetch all tasks
+
+3. update Task
+   . update a task by ID.
+
+4. delete Task
+   . Delete a task by ID.
+
+Controllers live in the Controller Folder.
+
+Error handling in controllers
+Wrap logic in try/catch
+onSuccess -> Sends success response
+onFailure -> Sends error response
+Do not crash the server
+
+What input controller expect:
+
+1. create Task
+   body: Title, description, completed, dueDate
+
+2. getAllTask
+   no input
+
+3. updateTask
+   params:id
+   body:fields to update
+
+4. delete Task
+   params:id
+
+What controllers return:
+.JSON response
+.Proper HTTP status code
+200/201 for sucess.
+400 for bad input.
+404 for not found.
+500 for server error.
+
+what will we have in our controller file:
+
+1. We will import the task model in the controller file.
+2. Then we will create the async funtions as the db read, write will take some time so we will have to wait
+
+function getAllTasks
+
+1. It will be an async function.
+2. We will use find to get all tasks.
+3. We will send 200 status along with all the tasks in response.
+4. We will send 500 internal server error if the try function fails.
+
+funtion createTask
+1.Async function. 2. We will use create function 3. We will take all the values from req.body 4. Send status 201 created along with the created task in response. 5. send status 500 in response if the try catch fails.
+
+function updateTask
+
+1. Async function
+2. We will use findByIdAndUpdate
+3. We will also use new:true so that it responds with updated tasks.
+4. We will use req.body to get all the values.
+5. We then reply with status 404 if the task returned is null.
+6. We can also send status 500 if the function wasn't able to update task.
+
+function deleteTask
+
+1. Async function
+2. We will use findByIdAndDelete().
+3. We will req.params.id to find the task and delete.
+   4.We will use the task from the function if it is null we respond 404 not found.
+4. we use 200 and response that it is deleted successfully.
+   6.If try catch fails we send back 500.
+
+We export all the functions we created so they are available outside the file to use them in our routes file.
+export { getAllTasks, createTask,updateTask, deleteTask };
+
+Routing
+Routing refers to how an app;ication responds to clinet requests.
+We will use express.Router class to create a mountable, modular route handler.
+A route handler instance is a complete middleware and routing system. for this reason it is often called as mini app.
+
+Do's
+1.Routes should only handle req,res. 2. business logic should be somewhere else.
+3.Do group routes by resource(eg. users, tasks,ads).
+4.use clear REST-style paths.
+5.do validatioin input
+6.handle errors 7. export the router 8. use middleware where applicable.
+
+task.router
+
+1. post-/- createTask
+2. get-/ - getAllTasks
+3. get-/:id-getTaskById
+   4.patch-/:id-updateTask
+   5.delete-/:id-deleteTask
+
+now we export the router and import it in server.js
+
+POSTMAN
+POSTMAN is the API platform used for building, testing and monitoring APIs.
+
+POSTMAN Collections
+POSTMAN collections are portable sets of API requests that we use can reuse, automate and share with others.
+We can use collections to save important details for each API request such as headers, authorization types, parameters and headers, request bodies, scripts, variables and documentations.
+
+Setup POSTMAN
+
+1. We will create a local environment.
+2. We will then create a collection call Task-API.
+3. Then we will create two subfolders for now.
+   a. General.
+   b. Task one.
+4. Then we will add out endpoints in the respective folders.
+5. We will also create a variable called baseurl for the whole collection.
+6. Then small variable for each of the folder.
+
+POSTMAN
+
+1. We used environment variable base_url for our base url.
+2. We used collection level variable api_base for /api addition to our base url.
+3. We used collection level variable task_id for saving id of a task to test the endpoints under task folder as it will be very usefull when we do testing.

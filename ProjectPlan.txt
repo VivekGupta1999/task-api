@@ -1,0 +1,75 @@
+🔹 BACKEND PHASE PLAN
+
+Phase 1 — Core Backend (Foundational)
+
+Goal: Full CRUD Task API, solid, tested, deployable.
+Steps included (already done or in progress):
+	1.	Project setup, Node, Express, dotenv ✅
+	2.	MongoDB connection ✅
+	3.	Server startup ✅
+	4.	Routes & Controllers ✅
+	5.	Task model & schema ✅
+	6.	CRUD endpoints ✅
+	7.	Postman testing ✅
+	8.	Git tracking & initial commits ✅
+
+Key points:
+	•	Everything works standalone, no AI yet.
+	•	Postman collection with base_url and folder-level variables is set.
+	•	DB connected, router mounted, controllers clean.
+
+⸻
+
+Phase 2 — Backend Improvements (Before AI)
+
+Goal: Prepare backend for AI layer safely.
+Steps:
+20. Basic request validation
+	•	Required fields, invalid IDs → return 400
+
+	21.	Centralized error handling
+
+	•	One middleware, remove repeated try/catch
+
+	22.	Standardize API responses
+
+	•	{ success, data, error } format
+
+	23.	Refactor controllers
+
+	•	Smaller functions, shared helpers
+
+	24.	Pagination & filtering (optional for tasks)
+	25.	Timestamps & soft deletes
+
+Why:
+	•	Clean, standardized API makes AI integration easier later.
+	•	AI endpoints will rely on structured, predictable responses.
+
+⸻
+
+Phase 3 — AI Integration
+
+Goal: Add AI features on top of stable backend.
+Where it starts: After Step 23–24, when the API is clean and predictable.
+
+Planned AI steps:
+	1.	Create AI service layer (not in controllers directly)
+	•	/services/ai/taskSummary.service.js
+	•	/services/ai/taskInsights.service.js
+	2.	Add new endpoints for AI analysis:
+	•	/api/tasks/:id/summary → human-readable task summary
+	•	/api/tasks/:id/insights → overdue, vague description detection
+	3.	Later: AI suggestions (title, due date, tags)
+	4.	Ensure safe design:
+	•	AI never modifies DB directly
+	•	Responses are suggestions
+	5.	Add environment variables for AI keys
+	6.	Rate limiting / error handling for AI calls
+
+⸻
+
+Phase 4 — Optional AI Enhancements
+	•	Auto-categorization and priority scoring
+	•	Integration with frontend if desired
+	•	Logging AI usage for metrics

@@ -1,6 +1,6 @@
 import express from 'express';
 import {createTask,getTaskById,getAllTasks,updateTask,deleteTask} from "../controllers/task.controller.js";
-
+import {validateObjectId} from "../middleware/validateObjectId.js"
 const router = express.Router();
 
 
@@ -12,13 +12,13 @@ router.get("/",getAllTasks);
 
 
 //get task by id
-router.get("/:id",getTaskById);
+router.get("/:id",validateObjectId,getTaskById);
 
 //update task
-router.patch("/:id",updateTask);
+router.patch("/:id",validateObjectId,updateTask);
 
 //delete task
-router.delete("/:id",deleteTask);
+router.delete("/:id",validateObjectId,deleteTask);
 
 
 export default router;

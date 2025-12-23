@@ -1,32 +1,32 @@
 import Task from "../models/task.model.js";
+import CustomError from "../util/CustomError.js";
 
-
-async function getAllTasks(req,res){
+async function getAllTasks(req,res,next){
     try{
         const tasks = await Task.find({});
         res.status(200).json({tasks});
     }
     catch(error){
-        console.log("Unable to Get Tasks. Error:",error);
-        res.status(500).json({message:"Unable to Get Tasks."});
+        next(new CustomError(500,"Unable to get tasks."));
+
     }
 }
 
-async function getTaskById(req,res){
+async function getTaskById(req,res,next){
     try{
         const task = await Task.findById(req.params.id);
         if(!task){
-            res.status(404).json({message:"Task Not found"})
-            return
+            throw new CustomError(404,"Task not found");
+           
         }else{
             res.status(200).json({task});
         }
     }catch(error){
-        res.status(500).json({message:"Unable to Get Task."})
+        next(error);
     }
 }
 
-async function createTask(req,res){
+async function createTask(req,res,next){
     try{
         const task = await Task.create({
             title:req.body.title,
@@ -37,11 +37,11 @@ async function createTask(req,res){
         })
         res.status(201).json({task});
     }catch(error){
-        res.status(500).json({message:"Unable to create a task."});
+       next(new CustomError(500,"Unable to create the task."));
     }
 }
 
-async function updateTask(req,res){
+async function updateTask(req,res,next){
     try{
       
         const task = await Task.findByIdAndUpdate(req.params.id,{
@@ -53,34 +53,32 @@ async function updateTask(req,res){
        
 
         if(!task){
-            res.status(404).json({message:"Task Not found"});
-            return
+            throw new CustomError(404,"Could not find the task to update");
         }else{
             res.status(200).json({task});
         }
         
 
     }catch(error){
-        res.status(500).json({message:"Unable to update the task"});
+        next(error);
     }
 }
 
 
 
-async function deleteTask(req,res){
+async function deleteTask(req,res,next){
     try{
         const task = await Task.findByIdAndDelete(req.params.id);
 
         if(!task){
-            res.status(404).json({message:"Not found."});
-            return;
+            throw new CustomError(404,"Task not found");
 
         }else{
             res.status(200).json({message:"Deleted Task"});
         }
 
     }catch(error){
-        res.status(500).json({message:"Unable to delete Task"});
+        next(error);
     }
 }
 

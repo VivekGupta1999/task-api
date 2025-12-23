@@ -5,7 +5,7 @@ dotenv.config();
 import express from 'express';
 import connectToMongoDB from './config/db.js';
 import taskRouter from './routes/task.route.js';
-
+import errorHandler  from './middleware/errorHandler.js';
 
 
 
@@ -16,13 +16,18 @@ const app = express();
 //add JSON Middleware so 
 app.use(express.json());
 
-app.use("/api/tasks",taskRouter)
 
 //setup basic get method for the server 
 app.get('/api/',(req,res)=>{
     res.send("Hello World!")
 })
 
+
+//the tasks router for our app
+app.use("/api/tasks",taskRouter)
+
+//the error handler middleware it should always come after the routes
+app.use(errorHandler);
 
 //function to start the server only if connection to MongoDB is successfull.
 async function startServer(){

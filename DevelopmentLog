@@ -200,3 +200,27 @@ POSTMAN
 1. We used environment variable base_url for our base url.
 2. We used collection level variable api_base for /api addition to our base url.
 3. We used collection level variable task_id for saving id of a task to test the endpoints under task folder as it will be very usefull when we do testing.
+
+Middleware
+We will be now creating a middleware functions that will ran before the handler functions and will hanlde some basic input validations and error handling.
+
+Validation Middlewares:
+
+1. validateObjectId - this function will use mongoose.isValidObjectId to check if the id in request parameters even exists if not it will return a response saying the ID is not valid.
+
+2. validateRequestObjectId - this function will be running a for loop on each of the supplied values in the request body and will check if they are not null. If they are it will send a response that it is missing required fields.
+
+Why centralizing Error Handling?
+It is a best practice that imporove code quality, maintainabilty and user experience.
+By implementing a consistent approach we can make sure the app can catch and handle errors in a way that ensures the stabiility of the application under various circumstances.
+
+Error Handling Middleware:
+Created a CustomError class extending Error with statusCode and statusMessage.
+
+Added rrrorHandler middleware at the end of the Express routes:
+
+1. Reads error.statusCode and error.statusMessage.
+2. Sends JSON response: {status:false,message};
+3. Defaults to 500 and "Internal Server Error" if missing.
+
+Updated controller functions to use next(error) instead of handling error manually.

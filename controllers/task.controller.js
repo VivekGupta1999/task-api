@@ -4,7 +4,10 @@ import CustomError from "../util/CustomError.js";
 async function getAllTasks(req,res,next){
     try{
         const tasks = await Task.find({});
-        res.status(200).json({tasks});
+        res.status(200).json({
+            success:true,
+            data:tasks
+        });
     }
     catch(error){
         next(new CustomError(500,"Unable to get tasks."));
@@ -19,7 +22,11 @@ async function getTaskById(req,res,next){
             throw new CustomError(404,"Task not found");
            
         }else{
-            res.status(200).json({task});
+            res.status(200).json({
+                success:true,
+                data:task
+
+            });
         }
     }catch(error){
         next(error);
@@ -35,7 +42,10 @@ async function createTask(req,res,next){
             dueDate:req.body.dueDate
 
         })
-        res.status(201).json({task});
+        res.status(201).json({
+            success:true,
+            data:task
+        });
     }catch(error){
        next(new CustomError(500,"Unable to create the task."));
     }
@@ -55,7 +65,10 @@ async function updateTask(req,res,next){
         if(!task){
             throw new CustomError(404,"Could not find the task to update");
         }else{
-            res.status(200).json({task});
+            res.status(200).json({
+                success:true,
+                data:task
+            });
         }
         
 
@@ -74,7 +87,10 @@ async function deleteTask(req,res,next){
             throw new CustomError(404,"Task not found");
 
         }else{
-            res.status(200).json({message:"Deleted Task"});
+            res.status(200).json({
+                success:true,
+                data:req.params.id
+        });
         }
 
     }catch(error){

@@ -217,10 +217,20 @@ By implementing a consistent approach we can make sure the app can catch and han
 Error Handling Middleware:
 Created a CustomError class extending Error with statusCode and statusMessage.
 
-Added rrrorHandler middleware at the end of the Express routes:
+Added errorHandler middleware at the end of the Express routes:
 
 1. Reads error.statusCode and error.statusMessage.
 2. Sends JSON response: {status:false,message};
 3. Defaults to 500 and "Internal Server Error" if missing.
 
 Updated controller functions to use next(error) instead of handling error manually.
+
+
+Standardize Success response
+Every API response should look predictable
+All successful response will follow this contract:
+{
+   success: true,
+   data: .......
+}
+

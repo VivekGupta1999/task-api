@@ -1,5 +1,5 @@
 import Task from "../models/task.model.js";
-import CustomError from "../util/CustomError.js";
+
 
 async function getAllTasks(req,res,next){
     try{

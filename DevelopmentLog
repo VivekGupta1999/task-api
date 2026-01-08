@@ -234,3 +234,206 @@ All successful response will follow this contract:
    data: .......
 }
 
+
+Now that all of this is done backend v1 is stable now we add AI Integration
+
+
+USER Problem:
+I have a goal, but i don't know how to break it into manageable steps or stay consistent.
+App’s job:
+	•	Reduce overwhelm
+	•	Provide clarity
+	•	Create momentum
+
+AI’s job:
+	•	Do the thinking the user struggles with
+
+
+MVP Core Use Case
+
+User creats a task with:
+1. A goal (free text)
+2. Target completion date
+3. Pacing preference:
+   . Daily
+   . Weekly
+
+AI does:
+1.Interprets the goal
+2. Breaks it into small, realistic goals.
+3. Distributes steps across times.
+4. Returns a plan, not just text.
+
+Normal todo apps:
+	•	User must already know what to do
+
+Our app:
+	•	User only needs to know what they want
+	•	AI figures out how to get there
+
+
+AI Output Contract Design
+1. Define what AI is allowed to return.
+2. Making the output stable,predictable and storage ready.
+3. Ensure future AI changes doesn't break out APP.
+
+Define strict output schema before implementation
+1. Goal Object.
+   "goal":{
+      "originalText":".....",
+      "interpretedText":"......."
+   }
+   a. user words are preserved exactly.
+   b. we can inspect how AI interpreted them.
+   c. can be used for regeneration later.
+
+2. Plan Object:
+   "plan":{
+      "pacing":"daily",
+      "startDate":".....",
+      "targetDate":".....",
+      "steps":12
+   }
+   a. time logic becomes data.
+   b. 
+
+3.  step Object:
+   "step":{
+      "stepNumber":1,
+      "title":"...",
+      "description":".....",
+      "scheduleDate":".....",
+      "estimatedTimeEffort":"........."
+   }
+
+
+
+API Work flow 
+1. Trigger
+   User creates a task with:
+   . a goal
+   . Target completion date
+   . Pacing preference(Daily/Weekly)
+   ->Backend receives the request -> Calls AI service to generate the subtasks
+
+2. Flow OverView
+   a. Backend receives Task creation request
+      .Validates input
+      .Stores goal first and then attach subtasks after AI returns them.
+   b. Backend sends goal to AI service.
+      .Include goal text, target date,pacing.
+      .Provide any extra metadata(user Id, existing task Id id needed)
+   c. AI returns structured plan
+      .Follows the output structure form step 1(goal summary + step array)
+   d. Backend Parses AI response
+      .check structure(all steps have title + time slots)
+      .Map each step to task model.
+      .Assingn actual dates based on pacing and target data.
+      .Save each step in DB.
+   e. Backend responses to frontend
+      .Includes
+         .task ID
+         .steps array
+         .goal summary
+
+Important Considerations
+.Indempotency
+   .If user submists same goal twice -> don't duplicate steps.
+.Error handling
+   .AI fails -> Backend can fall back
+      .returns main task only
+      .retry
+.Pacing
+   .Backend converts AI relative time(day1,week2) -> absolute dates
+.Step Metadata
+   .Include optional fields: estimated effors, dependencies
+.Extensibility
+   .Keeps AI response parsing isolated -> easier to swap AI model later.
+
+API response sample
+{
+  taskId: "abc123",
+  goalSummary: "Prepare for junior backend interview",
+  steps: [
+    { id: "s1", title: "Review JS basics", scheduledDate: "2026-01-10" },
+    { id: "s2", title: "Learn Node.js fundamentals", scheduledDate: "2026-01-12" },
+    { id: "s3", title: "Practice CRUD APIs", scheduledDate: "2026-01-14" }
+  ]
+}
+
+.Front end can display this plan immediately
+.Backend knows which steps are incomplete.
+.Reminder/notifications can later act on ScheduleDate
+
+Implementation Plan
+1. Create endpoint.
+2. Validate input(goal, target date, pacing).
+3. Store main task in DB.
+4. call AI service -> get subtasks
+5. convert relative times -> actual date.
+6. Save subtasks in DB linked to the main task
+7. Return structured responses to frontend.
+
+
+[ Client / Frontend ]
+        |
+        | 1. Create Task (goal, targetDate, pacing)
+        v
+[ Express API ]
+        |
+        | 2. Validate request
+        |    - goal present
+        |    - targetDate valid
+        |    - pacing = daily | weekly
+        |
+        v
+[ Task Controller ]
+        |
+        | 3. Save MAIN TASK
+        |    - goal
+        |    - targetDate
+        |    - pacing
+        |    - status: "planning"
+        |
+        v
+[ AI Planning Service ]
+        |
+        | 4. Send prompt:
+        |    - goal
+        |    - pacing
+        |    - timeframe
+        |
+        v
+[ AI Model ]
+        |
+        | 5. Returns structured plan
+        |    (steps with relative timing)
+        |
+        v
+[ AI Response Parser ]
+        |
+        | 6. Validate AI output shape
+        |    - title exists
+        |    - order exists
+        |
+        | 7. Convert relative timing
+        |    → actual calendar dates
+        |
+        v
+[ Database ]
+        |
+        | 8. Save steps
+        |    - linked to parent task
+        |    - scheduledDate
+        |    - status: pending
+        |
+        v
+[ API Response ]
+        |
+        | 9. Return:
+        |    - task
+        |    - steps
+        |
+        v
+[ Frontend ]
+

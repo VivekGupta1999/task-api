@@ -69,7 +69,7 @@ Controllers should:
 
 Controllers should not:
 
-1.  not now router paths.
+1.  not know router paths.
 2.  not import or use app.
 3.  not Start the server.
 4.  not Contain DB connection logic.
@@ -132,7 +132,11 @@ function getAllTasks
 4. We will send 500 internal server error if the try function fails.
 
 funtion createTask
-1.Async function. 2. We will use create function 3. We will take all the values from req.body 4. Send status 201 created along with the created task in response. 5. send status 500 in response if the try catch fails.
+1.Async function. 
+2. We will use create function 
+3. We will take all the values from req.body 
+4. Send status 201 created along with the created task in response. 
+5. send status 500 in response if the try catch fails.
 
 function updateTask
 

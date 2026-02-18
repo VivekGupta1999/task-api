@@ -1,4 +1,5 @@
 import Task from "../models/task.model.js";
+import { generatePlan } from "../src/ai/aiPlanning.Service.js";
 
 
 async function getAllTasks(req,res,next){
@@ -77,8 +78,6 @@ async function updateTask(req,res,next){
     }
 }
 
-
-
 async function deleteTask(req,res,next){
     try{
         const task = await Task.findByIdAndDelete(req.params.id);
@@ -98,4 +97,46 @@ async function deleteTask(req,res,next){
     }
 }
 
-export { getAllTasks, getTaskById, createTask, updateTask, deleteTask };
+async function createPlannedTask(req,res,next){
+    try{
+        const {goal,targetDate,pacing} = req.body;
+
+
+         if (!goal || !targetDate || !pacing) {
+            return res.status(400).json({
+                success: false,
+                message: "goal, targetDate and pacing are required"
+            });
+            }
+            
+        //create mini task first
+        const task = await Task.create({
+            goal,
+            targetDate,
+            pacing,
+            status:"planning"
+        });
+
+        //call AI
+        const aiPlan = await generatePlan({
+            goal,
+            targetDate,
+            pacing
+        });
+
+        //Temp: console output only
+        console.log("AI Plan");
+        console.log(JSON.stringify(aiPlan,null,2));
+
+
+        res.status(201).json({
+            success:true,
+            taskId:task._id,
+            planPreview:aiPlan
+        });
+    }catch(error){
+        next(error);
+    }
+}
+
+export { getAllTasks, getTaskById, createTask, updateTask, deleteTask, createPlannedTask };

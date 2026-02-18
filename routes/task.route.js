@@ -1,5 +1,5 @@
 import express from 'express';
-import {createTask,getTaskById,getAllTasks,updateTask,deleteTask} from "../controllers/task.controller.js";
+import {createTask,getTaskById,getAllTasks,updateTask,deleteTask, createPlannedTask} from "../controllers/task.controller.js";
 import {validateObjectId} from "../middleware/validateObjectId.js"
 import { validateRequestBody } from '../middleware/validateRequestBody.js';
 const router = express.Router();
@@ -23,5 +23,8 @@ router.patch("/:id",validateObjectId,updateTask);
 //delete task
 router.delete("/:id",validateObjectId,deleteTask);
 
+
+//creat AI task
+router.post("/plan",createPlannedTask);
 
 export default router;

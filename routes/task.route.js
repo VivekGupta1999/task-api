@@ -7,7 +7,7 @@ const router = express.Router();
 
 //create task
 
-router.post("/",validateRequestBody(['title','description','dueDate']),createTask);
+router.post("/",validateRequestBody(['goal','targetDate','pacing']),createTask);
 
 
 //get all tasks.

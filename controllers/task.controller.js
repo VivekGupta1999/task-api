@@ -1,6 +1,7 @@
 import Task from "../models/task.model.js";
 import { generatePlan } from "../src/ai/aiPlanning.Service.js";
-
+import { generateStepsForTask } from "../src/ai/stepGeneration.service.js";
+import { getTaskWithSteps } from "../src/taskService.js";
 
 async function getAllTasks(req,res,next){
     try{
@@ -18,17 +19,14 @@ async function getAllTasks(req,res,next){
 
 async function getTaskById(req,res,next){
     try{
-        const task = await Task.findById(req.params.id);
-        if(!task){
-            throw new CustomError(404,"Task not found");
-           
-        }else{
+        const data = await getTaskWithSteps(req.params.id);
+        
             res.status(200).json({
                 success:true,
-                data:task
+                data:data
 
             });
-        }
+        
     }catch(error){
         next(error);
     }
@@ -36,17 +34,27 @@ async function getTaskById(req,res,next){
 
 async function createTask(req,res,next){
     try{
-        const task = await Task.create({
-            title:req.body.title,
-            description:req.body.description,
-            completed: false,
-            dueDate:req.body.dueDate
+        const { goal, pacing, targetDate } = req.body;
 
-        })
+        const task = await Task.create({
+            goal,
+            pacing,
+            targetDate,
+            status: "generating"
+        });
+
         res.status(201).json({
             success:true,
             data:task
         });
+
+
+        //RUN AI generation in the background
+        generateStepsForTask(task).catch((err)=>{
+            console.error("Step Generation Failed",err);
+
+        });
+
     }catch(error){
        next(new CustomError(500,"Unable to create the task."));
     }
@@ -56,10 +64,10 @@ async function updateTask(req,res,next){
     try{
       
         const task = await Task.findByIdAndUpdate(req.params.id,{
-            title: req.body.title,
-            description: req.body.description,
-            dueDate: req.body.dueDate,
-            completed: req.body.completed
+            goal:req.body.goal,
+            pacing:req.body.pacing,
+            targetDate:req.body.targetDate,
+            status:req.body.status
         },{new:true});
        
 

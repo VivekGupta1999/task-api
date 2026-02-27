@@ -1,13 +1,16 @@
 import dotenv from 'dotenv';
 //configure the environment variables
 dotenv.config();
-
+import { MAX_TASK_RETRIES,WORKER_INTERVAL } from './src/config/job.config.js';
 import express from 'express';
 import connectToMongoDB from './config/db.js';
 import taskRouter from './routes/task.route.js';
 import errorHandler  from './middleware/errorHandler.js';
-
-
+import { startTaskPlannerWorker } from './src/workers/taskPlanner.worker.js';
+console.log("Worker Config:", {
+    MAX_TASK_RETRIES,
+    WORKER_INTERVAL
+});
 
 
 //create an instance of the express;
@@ -36,6 +39,7 @@ async function startServer(){
         console.log("Connected to DB Successfully.")
         app.listen(process.env.PORT,()=>{
             console.log("Server is running on local host port:",process.env.PORT);
+            startTaskPlannerWorker();
         })
     } catch (error) {
         console.log("Failed to start Server:",error);

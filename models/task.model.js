@@ -19,8 +19,18 @@ const taskSchema = new Schema({
     },
     status:{
         type:String,
-        enum:["pending","generating","ready"],
+        enum:["pending","generating","ready","failed"],
         default:"pending"
+    },
+    retryCount:{
+        type:Number,
+        default:0
+    },
+    lastAttemptAt:{
+        type:Date
+    },
+    errorMessage:{
+        type:String
     }
 },{
     timestamps: true

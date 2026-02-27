@@ -40,7 +40,7 @@ async function createTask(req,res,next){
             goal,
             pacing,
             targetDate,
-            status: "generating"
+            status: "pending"
         });
 
         res.status(201).json({
@@ -49,11 +49,6 @@ async function createTask(req,res,next){
         });
 
 
-        //RUN AI generation in the background
-        generateStepsForTask(task).catch((err)=>{
-            console.error("Step Generation Failed",err);
-
-        });
 
     }catch(error){
        next(new CustomError(500,"Unable to create the task."));

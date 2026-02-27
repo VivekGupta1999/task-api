@@ -441,3 +441,91 @@ Implementation Plan
         v
 [ Frontend ]
 
+
+AI Task Planning Implemented
+Feature Implemented
+
+AI-Drive Step Generation Service for goal based task
+
+The Sytem now allows user to create a goal instead of traditional to do tasks. The backend automatically generated
+structured steps using AI Plannig Service (currently Mocked).
+
+Architectural Shift
+
+previously we used a traditional task model
+title 
+description
+dueDate
+completed
+
+now we migrated to a goal based planning system
+goal
+targetDate
+pacing (Daily/Weekly)
+status
+
+Reason:
+The product focuses on helping users break large goals into actionable steps automatically
+
+
+Models introduced
+Task Model
+goal
+targetDate
+pacing 
+staus
+
+Status LifeCycle
+pending -> generating -> ready
+
+This allows tracking of AI Processing state
+
+
+Step Model
+Each step is stored seperately and is linked to parent task
+
+taskID
+stepNumber
+title 
+description
+dueDate
+completed
+
+Reason:
+This makes progress tracking easier and supports future features like:
+. Step Completion Tracking
+. Progress percentage
+. Notifications
+.Reordering steps
+. Editing AI generated Steps
+
+
+AI Planning Integration
+A planning Service was introduced
+
+Responsibilities:
+1. Call AI planning Service
+2. Parse AI output
+3. Convert relative time to real date
+4. Create Step Documents
+5. Update task status
+
+
+Important Implemetation Decison
+ Step Generation runs asynchronously in the background after task creation
+
+
+ Reason:
+ 1. AI Service may be slow
+ 2. Prevent blocking API response.
+ 3. Better Scalability
+
+Implementation:
+generateStepsForTask(task).catch(...)
+
+Upcoming Improvments
+Retry mechanisms for AI planning failures
+
+Planned Changes:
+
+Add task retry tracking
